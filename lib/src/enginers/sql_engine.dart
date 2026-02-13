@@ -1,5 +1,5 @@
-import 'package:maxi_db/src/enginers/sql_data_connector.dart';
-import 'package:maxi_db/src/enginers/sql_structure.dart';
+import 'package:maxi_sql/src/enginers/sql_data_connector.dart';
+import 'package:maxi_sql/src/enginers/sql_structure.dart';
 import 'package:maxi_framework/maxi_framework.dart';
 
 /// Interface defining the functions of an SQL engine, including connection and structure management. When it is discarded, all active connections will be closed and pending transactions will be canceled

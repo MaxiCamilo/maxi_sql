@@ -1,4 +1,4 @@
-name: maxi_db
+name: maxi_sql
 description: Library that serves as the foundation for the use, management, and execution of databases
 version: 1.0.0
 publish_to: none
@@ -15,6 +15,9 @@ dependencies:
     #  url: https://github.com/MaxiCamilo/maxi_framework.git
     #  ref: main
     path: ../maxi_framework
+
+  maxi_reflection:
+    path: ../maxi_reflection
 
 dev_dependencies:
   lints: ^6.0.0

@@ -1,4 +1,4 @@
-import 'package:maxi_db/maxi_sql.dart';
+import 'package:maxi_sql/maxi_sql.dart';
 
 enum QueryJoinerFunction { inner, left, right, fullOuter }
 

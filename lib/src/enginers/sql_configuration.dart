@@ -1,4 +1,4 @@
-import 'package:maxi_db/src/enginers/sql_engine.dart';
+import 'package:maxi_sql/src/enginers/sql_engine.dart';
 
 /// Signalizes the configuration of a SQL engine, allowing to build it and use it in the application
 abstract interface class SqlConfiguration {

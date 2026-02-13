@@ -1,4 +1,4 @@
-import 'package:maxi_db/src/enginers/sql_command.dart';
+import 'package:maxi_sql/src/enginers/sql_command.dart';
 import 'package:maxi_framework/maxi_framework.dart';
 
 /// Interface defining the functions of an SQL database connection, including command and query execution, as well as transaction management. When it is discarded, pending transactions will be canceled and connections will be closed

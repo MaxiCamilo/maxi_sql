@@ -1,4 +1,4 @@
-import 'package:maxi_db/maxi_sql.dart';
+import 'package:maxi_sql/maxi_sql.dart';
 
 /// These interfaces define the structure of SQL commands
 abstract interface class SqlCommand {}
