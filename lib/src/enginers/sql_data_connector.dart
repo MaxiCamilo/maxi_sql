@@ -20,19 +20,6 @@ abstract interface class SqlDataConnector implements Disposable {
 
   /// Executes the provided SQL insert command. If another command is active or a transaction is in progress, this command will be queued and executed once the current command or transaction finishes. If the connection is not active, it will attempt to connect before executing the command
   FutureResult<void> executeInsert(SqlInsertCommand command);
-
-  /// Begins a transaction, allowing to execute multiple commands in a single unit of work. If another transaction is already in progress, this transaction will be queued and started once the current transaction finishes. If the connection is not active, it will attempt to connect before starting the transaction
-  FutureResult<SqlTransaction> beginTransaction();
 }
 
-/// Interface defining the functions of an SQL transaction, allowing to execute multiple commands in a single unit of work, with the ability to commit or roll back the changes. When it is discarded, pending commands will be canceled and the transaction will be rolled back if it was not already confirmed
-abstract interface class SqlTransaction implements SqlDataConnector {
-  /// Indicates whether the command was committed or rolled back
-  bool get confirmed;
 
-  /// Commits the transaction, making all changes permanent. If the transaction was already confirmed, this will do nothing. If the transaction was rolled back, this will return an error
-  FutureResult<void> commit();
-
-  /// Rolls back the transaction, undoing all changes. If the transaction was already confirmed, this will return an error. If the transaction was already rolled back, this will do nothing
-  FutureResult<void> rollback();
-}
