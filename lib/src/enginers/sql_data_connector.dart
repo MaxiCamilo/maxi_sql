@@ -2,13 +2,7 @@ import 'package:maxi_sql/src/enginers/sql_command.dart';
 import 'package:maxi_framework/maxi_framework.dart';
 
 /// Interface defining the functions of an SQL database connection, including command and query execution, as well as transaction management. When it is discarded, pending transactions will be canceled and connections will be closed
-abstract interface class SqlDataConnector implements Disposable {
-  /// Indicates if the connection is currently active and can be used to execute commands and queries. If it is discarded, it will be false
-  bool get isConnected;
-
-  /// Establishes the connection to the database, allowing to execute commands and queries. If the connection is already active, it will do nothing
-  FutureResult<void> connect();
-
+abstract interface class SqlDataConnector {
   /// Executes the provided SQL query command and returns the resulting table. If another command is active or a transaction is in progress, this query will be queued and executed once the current command or transaction finishes. If the connection is not active, it will attempt to connect before executing the query
   FutureResult<TableResult> executeQuery(SqlQueryCommand command);
 
@@ -21,5 +15,3 @@ abstract interface class SqlDataConnector implements Disposable {
   /// Executes the provided SQL insert command. If another command is active or a transaction is in progress, this command will be queued and executed once the current command or transaction finishes. If the connection is not active, it will attempt to connect before executing the command
   FutureResult<void> executeInsert(SqlInsertCommand command);
 }
-
-

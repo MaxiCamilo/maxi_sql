@@ -14,10 +14,10 @@ class SqlQueryCommand implements SqlCommand {
   final List<QueryJoiner> joinedTables;
   final List<QueryOrder> orders;
   final List<String> grouped;
-  final List<ColumnCondition> having;
+  final List<ColumnCondition> havings;
   final int? limit;
 
-  const SqlQueryCommand({required this.tables, this.columns = const [], this.conditions = const [], this.orders = const [], this.grouped = const [], this.having = const [], this.limit, this.joinedTables = const []});
+  const SqlQueryCommand({required this.tables, this.columns = const [], this.conditions = const [], this.orders = const [], this.grouped = const [], this.havings = const [], this.limit, this.joinedTables = const []});
 }
 
 /// Signature for objects that perform write operations, such as insert, update, delete

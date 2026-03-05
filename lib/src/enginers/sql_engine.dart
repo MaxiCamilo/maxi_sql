@@ -21,6 +21,9 @@ abstract interface class SqlTransaction implements SqlEngine {
   /// Indicates whether the command was committed or rolled back
   bool get confirmed;
 
+  /// Indicates whether the transaction completed successfully
+  bool get wasCommitted;
+
   /// Commits the transaction, making all changes permanent. If the transaction was already confirmed, this will do nothing. If the transaction was rolled back, this will return an error
   FutureResult<void> commit();
 

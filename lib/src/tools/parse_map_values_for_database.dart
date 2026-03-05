@@ -1,5 +1,4 @@
 import 'package:maxi_framework/maxi_framework.dart';
-import 'package:maxi_reflection/maxi_reflection.dart';
 import 'package:maxi_sql/src/tools/parse_value_for_database.dart';
 
 class ParseMapValuesForDatabase implements SyncFunctionality<Map<String, dynamic>> {
