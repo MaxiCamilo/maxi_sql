@@ -18,6 +18,19 @@ class SqlQueryCommand implements SqlCommand {
   final int? limit;
 
   const SqlQueryCommand({required this.tables, this.columns = const [], this.conditions = const [], this.orders = const [], this.grouped = const [], this.havings = const [], this.limit, this.joinedTables = const []});
+
+  factory SqlQueryCommand.clone(SqlQueryCommand command) {
+    return SqlQueryCommand(
+      tables: List.from(command.tables),
+      columns: List.from(command.columns),
+      conditions: List.from(command.conditions),
+      orders: List.from(command.orders),
+      grouped: List.from(command.grouped),
+      havings: List.from(command.havings),
+      limit: command.limit,
+      joinedTables: List.from(command.joinedTables),
+    );
+  }
 }
 
 /// Signature for objects that perform write operations, such as insert, update, delete
