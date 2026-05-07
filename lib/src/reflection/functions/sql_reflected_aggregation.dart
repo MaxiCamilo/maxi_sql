@@ -2,7 +2,7 @@ import 'package:maxi_framework/maxi_framework.dart';
 import 'package:maxi_sql/maxi_sql.dart';
 import 'package:maxi_sql/src/reflection/functions/define_empty_primary_keys.dart';
 
-class SqlReflectedAggregation<T> with FunctionalityMixin<void> {
+class SqlReflectedAggregation<T> with FunctionalityMixin<List<int>> {
   final SqlEngine engine;
   final SqlReflectedClassStructure<T> reflectedStructure;
   final List<T> content;
@@ -10,9 +10,9 @@ class SqlReflectedAggregation<T> with FunctionalityMixin<void> {
   const SqlReflectedAggregation({required this.engine, required this.reflectedStructure, required this.content});
 
   @override
-  FutureResult<void> runInternalFuncionality() async {
-    if(content.isEmpty) {
-      return voidResult;
+  FutureResult<List<int>> runInternalFuncionality() async {
+    if (content.isEmpty) {
+      return <int>[].asResultValue();
     }
 
     if (reflectedStructure.editableFields.isEmpty) {
@@ -60,6 +60,6 @@ class SqlReflectedAggregation<T> with FunctionalityMixin<void> {
 
       i++;
     }
-    return voidResult;
+    return content.resultMap((x) => reflectedStructure.reflectedEntity.getPrimaryKey(item: x));
   }
 }

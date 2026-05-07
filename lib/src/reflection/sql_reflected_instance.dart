@@ -21,7 +21,7 @@ class SqlReflectedInstance<T> with DisposableMixin, InitializableMixin {
   FutureResult<void> eliminateAll() async => initialize().onCorrectFuture((_) => reflectedTable.eliminateAll(engine));
   FutureResult<void> eliminateDeterminated({required List<int> ids}) async => initialize().onCorrectFuture((_) => reflectedTable.eliminateDeterminated(engine: engine, ids: ids));
 
-  FutureResult<void> aggregate({required List<T> items}) async => await initialize().onCorrectFuture((_) => reflectedTable.aggregate(engine: engine, items: items));
+  FutureResult<List<int>> aggregate({required List<T> items}) async => await initialize().onCorrectFuture((_) => reflectedTable.aggregate(engine: engine, items: items));
 
   FutureResult<void> modify({required List<T> items}) async => await initialize().onCorrectFuture((_) => reflectedTable.modify(engine: engine, items: items));
 
@@ -39,6 +39,11 @@ class SqlReflectedInstance<T> with DisposableMixin, InitializableMixin {
 
   FutureResult<int> obtainMaximumKey() async => await initialize().onCorrectFuture((_) => reflectedTable.obtainMaximumKey(engine: engine));
   FutureResult<int> obtainMinimumKey() async => await initialize().onCorrectFuture((_) => reflectedTable.obtainMinimumKey(engine: engine));
+
+  FutureResult<T?> selectValue({required int identifier}) async => await initialize().onCorrectFuture((_) => reflectedTable.selectValue(engine: engine, identifier: identifier));
+  FutureResult<T> obtainValue({required int identifier}) async => await initialize().onCorrectFuture((_) => reflectedTable.obtainValue(engine: engine, identifier: identifier));
+  FutureResult<T> obtainMaximum() async => await initialize().onCorrectFuture((_) => reflectedTable.obtainMaximum(engine: engine));
+  FutureResult<T> obtainMinimum() async => await initialize().onCorrectFuture((_) => reflectedTable.obtainMinimum(engine: engine));
 
   @override
   void performObjectDiscard() {}

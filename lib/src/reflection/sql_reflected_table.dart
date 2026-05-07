@@ -24,7 +24,8 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
   final List<ColumnKeyGroup> _primaryKeyGroups;
   final List<ColumnKeyGroup> _uniqueKeyGroups;
   final List<ReflectedField> _reflectedFields;
-  final ReflectedEntity<T>? _reflectedEntity;
+
+  ReflectedEntity<T>? _reflectedEntity;
 
   final List<ReflectedField>? _editableFields;
 
@@ -39,7 +40,7 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
   FutureResult<void> eliminateDeterminated({required SqlEngine engine, required List<int> ids}) async =>
       initialize().onCorrectFuture((_) => SqlReflectedDeterminateElimination<T>(engine: engine, reflectedStructure: _structure, identifiers: ids).execute());
 
-  FutureResult<void> aggregate({required SqlEngine engine, required List<T> items}) async =>
+  FutureResult<List<int>> aggregate({required SqlEngine engine, required List<T> items}) async =>
       await initialize().onCorrectFuture((_) => SqlReflectedAggregation<T>(engine: engine, reflectedStructure: _structure, content: items).execute());
 
   FutureResult<void> modify({required SqlEngine engine, required List<T> items}) async =>
@@ -91,7 +92,65 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
     ).execute(),
   );
 
- 
+  FutureResult<T?> selectValue({required SqlEngine engine, required int identifier}) async {
+    final listResult = await queryIterator(engine: engine, from: identifier, amount: 1);
+    if (listResult.itsFailure) {
+      return listResult.cast();
+    }
+
+    return listResult.content.isEmpty ? ResultValue(content: null) : ResultValue(content: listResult.content.first);
+  }
+
+  FutureResult<T> obtainValue({required SqlEngine engine, required int identifier}) async {
+    final valueResult = await selectValue(engine: engine, identifier: identifier);
+    if (valueResult.itsFailure) {
+      return valueResult.cast();
+    }
+
+    if (valueResult.content == null) {
+      return NegativeResult.controller(
+        code: ErrorCode.nonExistent,
+        message: FlexibleOration(message: 'The record with identifier %1 does not exist in the table %2', textParts: [identifier, tableName]),
+      );
+    }
+
+    return valueResult.content!.asResultValue();
+  }
+
+  FutureResult<T> obtainMaximum({required SqlEngine engine}) async {
+    final lastKeyResult = await obtainMaximumKey(engine: engine);
+    if (lastKeyResult.itsFailure) {
+      return lastKeyResult.cast();
+    }
+
+    final lastKey = lastKeyResult.content;
+    if (lastKey == 0) {
+      return NegativeResult.controller(
+        code: ErrorCode.nonExistent,
+        message: FlexibleOration(message: 'The table %1 has no records', textParts: [tableName]),
+      );
+    }
+
+    return await obtainValue(engine: engine, identifier: lastKey);
+  }
+
+  FutureResult<T> obtainMinimum({required SqlEngine engine}) async {
+    final firstKeyResult = await obtainMinimumKey(engine: engine);
+    if (firstKeyResult.itsFailure) {
+      return firstKeyResult.cast();
+    }
+
+    final firstKey = firstKeyResult.content;
+    if (firstKey == 0) {
+      return NegativeResult.controller(
+        code: ErrorCode.nonExistent,
+        message: FlexibleOration(message: 'The table %1 has no records', textParts: [tableName]),
+      );
+    }
+
+    return await obtainValue(engine: engine, identifier: firstKey);
+  }
+
   /// [/Extension method]
 
   SqlReflectedTable.custom({required ReflectionLibrary reflectionLibrary, required SqlReflectedClassStructure<T> structure})
@@ -145,21 +204,18 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
   Result<void> _buildStructure() {
     late final List<ReflectedField> reflectedFields;
     late final List<ReflectedField> editableFields;
-    late final ReflectedEntity<T> reflectedEntity;
 
-    if (_reflectedEntity != null) {
-      reflectedEntity = _reflectedEntity;
-    } else {
+    if (_reflectedEntity == null) {
       final reflectedEntityResult = _reflectionLibrary.searchEntityReflected<T>();
 
       if (reflectedEntityResult.itsFailure) {
         return reflectedEntityResult.cast();
       }
-      reflectedEntity = reflectedEntityResult.content;
+      _reflectedEntity = reflectedEntityResult.content;
     }
 
     if (_reflectedFields.isEmpty) {
-      reflectedFields = reflectedEntity.classReflector.fields;
+      reflectedFields = _reflectedEntity!.classReflector.fields;
     } else {
       reflectedFields = _reflectedFields;
     }
@@ -167,12 +223,12 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
     if (_editableFields != null) {
       editableFields = _editableFields;
     } else {
-      editableFields = reflectedEntity.changeableFields;
+      editableFields = _reflectedEntity!.changeableFields;
     }
 
     return BuildSqlReflectedStructure<T>(
       reflectionLibrary: _reflectionLibrary,
-      reflectedEntity: reflectedEntity,
+      reflectedEntity: _reflectedEntity!,
       reflectedFields: reflectedFields,
       tableName: tableName,
       foreignKeys: _foreignKeys,
