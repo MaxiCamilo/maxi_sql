@@ -45,6 +45,11 @@ class SqlReflectedInstance<T> with DisposableMixin, InitializableMixin {
   FutureResult<T> obtainMaximum() async => await initialize().onCorrectFuture((_) => reflectedTable.obtainMaximum(engine: engine));
   FutureResult<T> obtainMinimum() async => await initialize().onCorrectFuture((_) => reflectedTable.obtainMinimum(engine: engine));
 
+  FutureResult<int?> selectFirstID({List<ColumnCondition> conditions = const []}) => reflectedTable.selectFirstID(engine: engine, conditions: conditions);
+  FutureResult<T?> selectFirst({List<ColumnCondition> conditions = const []}) => reflectedTable.selectFirst(engine: engine, conditions: conditions);
+
+  FutureResult<List<T>> queryWhere({required List<ColumnCondition> conditions, int from = 0, int? limits}) => reflectedTable.queryWhere(engine: engine, conditions: conditions, from: from, limits: limits);
+
   @override
   void performObjectDiscard() {}
 }

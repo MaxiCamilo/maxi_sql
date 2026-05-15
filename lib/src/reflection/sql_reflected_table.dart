@@ -60,6 +60,23 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
     ).execute(),
   );
 
+  FutureResult<List<T>> queryWhere({required SqlEngine engine, required List<ColumnCondition> conditions, int from = 0, int? limits}) async => await initialize()
+      .onCorrect((_) => _reflectedEntity!.getPrimaryKeyField())
+      .onCorrectFuture(
+        (primary) => ReflectedSelectionQuery<T>(
+          engine: engine,
+          reflectedStructure: _structure,
+          queryCommand: SqlQueryCommand(
+            tables: [TableSelection(tableName)],
+            conditions: from == 0 ? conditions : [...conditions, ColumnCompareValue(columnName: primary.name, conditionator: CompareSelectedValue.greaterEqual(from))],
+            limit: limits,
+            orders: [
+              QueryOrder(fields: [primary.name], isAscendent: true),
+            ],
+          ),
+        ).execute(),
+      );
+
   FutureResult<List<int>> queryIdentifiers({required SqlEngine engine, List<ColumnCondition> conditions = const [], int? limits}) async =>
       await initialize().onCorrectFuture((_) => SqlReflectedObtainIdentifiers<T>(engine: engine, reflectedStructure: _structure, conditions: conditions, limits: limits).execute());
 
@@ -91,6 +108,29 @@ class SqlReflectedTable<T> with DisposableMixin, InitializableMixin {
       limits: amount,
     ).execute(),
   );
+
+  FutureResult<int?> selectFirstID({required SqlEngine engine, List<ColumnCondition> conditions = const []}) async {
+    final idsResult = await queryIdentifiers(engine: engine, conditions: conditions, limits: 1);
+    if (idsResult.itsFailure) {
+      return idsResult.cast();
+    }
+
+    return ResultValue(content: idsResult.content.isEmpty ? null : idsResult.content.first);
+  }
+
+  FutureResult<T?> selectFirst({required SqlEngine engine, List<ColumnCondition> conditions = const []}) async {
+    final idResult = await selectFirstID(engine: engine, conditions: conditions);
+    if (idResult.itsFailure) {
+      return idResult.cast();
+    }
+
+    final id = idResult.content;
+    if (id == null) {
+      return const ResultValue(content: null);
+    }
+
+    return await selectValue(engine: engine, identifier: id);
+  }
 
   FutureResult<T?> selectValue({required SqlEngine engine, required int identifier}) async {
     final listResult = await queryIterator(engine: engine, from: identifier, amount: 1);
